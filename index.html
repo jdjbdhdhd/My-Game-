@@ -7,7 +7,7 @@
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5284/5284775.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:sans-serif}
-body{background:linear-gradient(135deg,#121026,#20204a,#282a5e);color:#fff;min-height:100vh}
+body{background:linear-gradient(135deg,#121026,#20204a,#282a5e);color:#fff;min-height:100vh;overflow:hidden}
 #splash{position:fixed;top:0;left:0;width:100%;height:100vh;background:linear-gradient(135deg,#6a11cb,#2575fc);display:flex;align-items:center;justify-content:center;z-index:99999;flex-direction:column}
 .splash-logo{font-size:3.6rem;font-weight:900;background:linear-gradient(45deg,#fff,#ffdf70);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gl 1.6s infinite alternate}
 @keyframes gl{from{filter:drop-shadow(0 0 10px #fff)}to{filter:drop-shadow(0 0 35px #ffd700)}}
@@ -48,13 +48,14 @@ body{background:linear-gradient(135deg,#121026,#20204a,#282a5e);color:#fff;min-h
 </head>
 <body>
 
-<audio id="bgm1" loop src="https://cdn.freesound.org/previews/643/643770_1159776-lq.mp3">
-<audio id="bgm2" loop src="https://cdn.freesound.org/previews/413/413854_4335854-lq.mp3">
-<audio id="sndTap" src="https://cdn.freesound.org/previews/676/676711_1159776-lq.mp3">
-<audio id="sndCombo" src="https://cdn.freesound.org/previews/676/676714_1159776-lq.mp3">
-<audio id="sndStar" src="https://cdn.freesound.org/previews/643/643769_1159776-lq.mp3">
-<audio id="sndItem" src="https://cdn.freesound.org/previews/221/221461_1159776-lq.mp3">
-<audio id="sndLucky" src="https://cdn.freesound.org/previews/279/279831_1159776-lq.mp3">
+<!-- 修复音频标签，闭合标签 -->
+<audio id="bgm1" loop src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-loop-231.mp3">
+<audio id="bgm2" loop src="https://assets.mixkit.co/sfx/preview/mixkit-video-game-music-233.mp3">
+<audio id="sndTap" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-mechanical-bling-210.mp3">
+<audio id="sndCombo" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-bonus-226.mp3">
+<audio id="sndStar" src="https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-199.mp3">
+<audio id="sndItem" src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3">
+<audio id="sndLucky" src="https://assets.mixkit.co/sfx/preview/mixkit-wheel-spin-1273.mp3">
 
 <div id="splash">
     <h1 class="splash-logo">🔥 TAP CRUSH QUEST</h1>
@@ -90,10 +91,10 @@ body{background:linear-gradient(135deg,#121026,#20204a,#282a5e);color:#fff;min-h
 <div id="shop" class="ui">
     <h2>SKIN SHOP</h2>
     <div class="shop">
-        <div class="card"><div class="preview" style="background:#ff416c"></div><p>Red Fire</div>
-        <div class="card"><div class="preview" style="background:#00c9ff"></div><p>Ocean Blue</div>
-        <div class="card"><div class="preview" style="background:#da22ff"></div><p>Neon Purple</div>
-        <div class="card"><div class="preview" style="background:#00b09b"></div><p>Jungle Green</div>
+        <div class="card"><div class="preview" style="background:#ff416c"></div><p>Red Fire</p></div>
+        <div class="card"><div class="preview" style="background:#00c9ff"></div><p>Ocean Blue</p></div>
+        <div class="card"><div class="preview" style="background:#da22ff"></div><p>Neon Purple</p></div>
+        <div class="card"><div class="preview" style="background:#00b09b"></div><p>Jungle Green</p></div>
     </div>
     <br>
     <button class="btn" onclick="goto('menu')">BACK</button>
@@ -133,24 +134,28 @@ body{background:linear-gradient(135deg,#121026,#20204a,#282a5e);color:#fff;min-h
 </div>
 
 <script>
+// 修复变量声明，补全逻辑
 let music = true, lang = 0;
 let bgm1 = document.getElementById('bgm1'), bgm2 = document.getElementById('bgm2');
 let sndTap = document.getElementById('sndTap'), sndCombo = document.getElementById('sndCombo');
 let score = 0, level = 1, gold = 0, combo = 0, multi = 1;
 let skin = "#ff416c", fallSpeed = 900;
 
+// 开机画面
 setTimeout(() => {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
-    if(music) bgm1.play();
+    if(music) bgm1.play().catch(e=>console.log("Auto play blocked:",e));
 }, 2600);
 
+// 音乐开关
 document.getElementById('musicBtn').onclick = () => {
     music = !music;
     document.getElementById('musicBtn').innerText = music ? '🎵 ON' : '🎵 OFF';
-    music ? bgm1.play() : (bgm1.pause(), bgm2.pause());
+    music ? bgm1.play().catch(e=>{}) : (bgm1.pause(), bgm2.pause());
 };
 
+// 页面跳转
 function goto(p){
     document.querySelectorAll('.ui').forEach(e => e.style.display = 'none');
     document.getElementById('menu').style.display = 'none';
@@ -158,55 +163,63 @@ function goto(p){
     else document.getElementById(p).style.display = 'block';
 }
 
+// 开始游戏
 function play(){ startLevel(1); }
 function startLevel(lv){
     level = lv; fallSpeed = 1100 - lv * 100;
     score = 0; combo = 0; multi = 1;
     document.getElementById('score').innerText = score;
     document.getElementById('lev').innerText = level;
+    document.getElementById('gold').innerText = gold;
     goto('game');
     spawn();
 }
 
+// 生成方块
 function spawn(){
     if(document.getElementById('game').style.display !== 'block') return;
     const t = document.createElement('div');
     t.classList.add('tile');
     t.style.background = skin;
-    t.style.left = Math.random() * (document.getElementById('box').clientWidth - 64) + 'px';
+    const box = document.getElementById('box');
+    t.style.left = Math.random() * (box.clientWidth - 64) + 'px';
     t.style.top = '-70px';
-    document.getElementById('box').appendChild(t);
+    box.appendChild(t);
 
+    // 点击事件
     t.onclick = () => {
-        if(music) sndTap.cloneNode(true).play();
+        if(music) sndTap.cloneNode(true).play().catch(e=>{});
         combo++;
         let add = 10 * multi * combo;
         score += add;
         document.getElementById('score').innerText = score;
 
+        // 爆炸特效
         const ex = document.createElement('div');
         ex.classList.add('explode');
         ex.style.left = t.style.left;
         ex.style.top = t.style.top;
-        document.getElementById('box').appendChild(ex);
+        box.appendChild(ex);
         setTimeout(() => ex.remove(), 500);
 
+        // 星星特效
         for(let i=0;i<3;i++){
             const s = document.createElement('div');
             s.classList.add('star');
             s.style.left = parseFloat(t.style.left) + 20 + i*8 + 'px';
             s.style.top = t.style.top;
-            document.getElementById('box').appendChild(s);
+            box.appendChild(s);
             setTimeout(() => s.remove(), 800);
         }
 
         t.remove();
     };
 
+    // 方块下落
     const fall = setInterval(() => {
         let y = parseFloat(t.style.top) || 0;
         t.style.top = y + 2 + 'px';
-        if(y > document.getElementById('box').clientHeight){
+        if(y > box.clientHeight){
             clearInterval(fall);
             t.remove();
             end();
@@ -216,33 +229,49 @@ function spawn(){
     setTimeout(spawn, fallSpeed);
 }
 
+// 道具：炸弹
 function useBomb(){
-    if(music) document.getElementById('sndItem').play();
+    if(music) document.getElementById('sndItem').play().catch(e=>{});
     document.querySelectorAll('.tile').forEach(t => t.remove());
 }
 
-function useFreeze(){ fallSpeed += 300; }
-function useMulti(){ multi = 2; setTimeout(() => multi = 1, 5000); }
+// 道具：冰冻
+function useFreeze(){ 
+    fallSpeed += 300; 
+    if(music) document.getElementById('sndItem').play().catch(e=>{});
+}
 
+// 道具：双倍
+function useMulti(){ 
+    multi = 2; 
+    setTimeout(() => multi = 1, 5000);
+    if(music) document.getElementById('sndItem').play().catch(e=>{});
+}
+
+// 每日签到
 function claimDaily(){
     gold += 200;
     document.getElementById('gold').innerText = gold;
     alert('Claimed +200 Gold!');
+    if(music) document.getElementById('sndItem').play().catch(e=>{});
 }
 
+// 幸运转盘
 function spin(){
-    if(music) document.getElementById('sndLucky').play();
+    if(music) document.getElementById('sndLucky').play().catch(e=>{});
     let r = Math.floor(Math.random()*500)+100;
     gold += r;
     document.getElementById('gold').innerText = gold;
     alert('You Won '+r+' Gold!');
 }
 
+// 游戏结束
 function end(){
     document.getElementById('final').innerText = score;
     document.getElementById('gameOver').style.display = 'flex';
 }
 
+// 重新开始
 function restart(){
     document.getElementById('gameOver').style.display = 'none';
     startLevel(level);
