@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>💰 手速挑战（赚钱版）</title>
+
+<style>
+body {
+    text-align: center;
+    background: #111;
+    color: white;
+    font-family: Arial;
+}
+
+#gameBox {
+    width: 320px;
+    height: 320px;
+    margin: 20px auto;
+    background: #222;
+    position: relative;
+    border-radius: 10px;
+}
+
+.target {
+    width: 60px;
+    height: 60px;
+    background: red;
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 手速挑战（赚钱版）</h1>
+<p>得分：<span id="score">0</span></p>
+<p id="combo"></p>
+
+<div id="gameBox"></div>
+
+<div id="gameOver" style="display:none;">
+    <h2>💀 游戏结束</h2>
+    <button onclick="restart()">再来一局</button>
+    <button onclick="watchAd()">📺 看广告复活</button>
+</div>
+
+<script>
+let score = 0;
+let combo = 0;
+let gameOver = false;
+let canRevive = true;
+
+let box = document.getElementById("gameBox");
+
+function spawnTarget() {
+    if (gameOver) return;
+
+    let target = document.createElement("div");
+    target.className = "target";
+
+    target.style.left = Math.random() * 260 + "px";
+    target.style.top = Math.random() * 260 + "px";
+
+    let clicked = false;
+
+    target.onclick = function () {
+        if (clicked) return;
+        clicked = true;
+
+        score++;
+        combo++;
+
+        document.getElementById("score").innerText = score;
+        document.getElementById("combo").innerText = "🔥 连击 x" + combo;
+
+        target.remove();
+    };
+
+    box.appendChild(target);
+
+    setTimeout(() => {
+        if (!clicked) {
+            combo = 0;
+            document.getElementById("combo").innerText = "❌ 断连";
+            endGame();
+        }
+        target.remove();
+    }, 800);
+}
+
+let speed = 900;
+
+function gameLoop() {
+    if (gameOver) return;
+
+    spawnTarget();
+
+    speed -= 5;
+    if (speed < 300) speed = 300;
+
+    setTimeout(gameLoop, speed);
+}
+
+function endGame() {
+    gameOver = true;
+    document.getElementById("gameOver").style.display = "block";
+}
+
+function restart() {
+    score = 0;
+    combo = 0;
+    speed = 900;
+    gameOver = false;
+    canRevive = true;
+
+    document.getElementById("score").innerText = 0;
+    document.getElementById("combo").innerText = "";
+    document.getElementById("gameOver").style.display = "none";
+
+    box.innerHTML = "";
+    gameLoop();
+}
+
+// 模拟广告（以后换成真实广告）
+function watchAd() {
+    if (!canRevive) {
+        alert("只能复活一次！");
+        return;
+    }
+
+    alert("📺 广告播放中...（假装30秒）");
+
+    setTimeout(() => {
+        alert("复活成功🔥");
+        gameOver = false;
+        canRevive = false;
+        document.getElementById("gameOver").style.display = "none";
+        gameLoop();
+    }, 1000);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
